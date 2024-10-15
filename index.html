@@ -33,9 +33,9 @@
 
         // Moon texture loading
         const textureLoader = new THREE.TextureLoader();
-        const moonTexture = textureLoader.load('https://svs.gsfc.nasa.gov/4720/#media_group_322783');
-        const normalTexture = textureLoader.load('https://svs.gsfc.nasa.gov/4720/#media_group_322783');
-        const displacementTexture = textureLoader.load('https://svs.gsfc.nasa.gov/4720/#media_group_322785');
+        const moonTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_color.jpg');
+        const normalTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_normal.jpg');
+        const displacementTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_displacement.jpg');
 
         // Moon geometry and material
         const moonGeometry = new THREE.SphereGeometry(2, 128, 128);
