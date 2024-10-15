@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Moon</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Realistic Moon - Use mouse to rotate view</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+    <script>
+        // Three.js scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Moon texture loading
+        const textureLoader = new THREE.TextureLoader();
+        const moonTexture = textureLoader.load('https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.jpg');
+        const normalTexture = textureLoader.load('https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_4_uint16.jpg');
+        const displacementTexture = textureLoader.load('https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_4_uint16.jpg');
+
+        // Moon geometry and material
+        const moonGeometry = new THREE.SphereGeometry(2, 128, 128);
+        const moonMaterial = new THREE.MeshStandardMaterial({
+            map: moonTexture,
+            normalMap: normalTexture,
+            displacementMap: displacementTexture,
+            displacementScale: 0.1,
+            roughness: 0.7,
+            metalness: 0.3
+        });
+        const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        scene.add(moon);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x333333);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 3, 5);
+        scene.add(pointLight);
+
+        // Starfield background
+        const starGeometry = new THREE.BufferGeometry();
+        const starMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.05,
+            transparent: true
+        });
+
+        const starVertices = [];
+        for (let i = 0; i < 20000; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const y = (Math.random() - 0.5) * 2000;
+            const z = -Math.random() * 2000;
+            starVertices.push(x, y, z);
+        }
+
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+        // Camera position
+        camera.position.z = 5;
+
+        // Animation
+        let moonRotation = { value: 0 };
+        gsap.to(moonRotation, {
+            value: Math.PI * 2,
+            duration: 24,
+            ease: "none",
+            repeat: -1
+        });
+
+        // Interaction
+        let isDragging = false;
+        let previousMousePosition = {
+            x: 0,
+            y: 0
+        };
+
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.offsetX - previousMousePosition.x,
+                    y: e.offsetY - previousMousePosition.y
+                };
+
+                moon.rotation.y += deltaMove.x * 0.005;
+                moon.rotation.x += deltaMove.y * 0.005;
+            }
+
+            previousMousePosition = {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            isDragging = false;
+        });
+
+        // GUI controls
+        const gui = new dat.GUI();
+        const moonControls = gui.addFolder('Moon Controls');
+        moonControls.add(moonMaterial, 'roughness', 0, 1);
+        moonControls.add(moonMaterial, 'metalness', 0, 1);
+        moonControls.add(moonMaterial, 'displacementScale', 0, 0.2);
+        moonControls.open();
+
+        const lightControls = gui.addFolder('Light Controls');
+        lightControls.add(pointLight.position, 'x', -10, 10);
+        lightControls.add(pointLight.position, 'y', -10, 10);
+        lightControls.add(pointLight.position, 'z', -10, 10);
+        lightControls.add(pointLight, 'intensity', 0, 2);
+        lightControls.open();
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            moon.rotation.y = moonRotation.value;
+
+            stars.rotation.y += 0.0001;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Responsive design
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
