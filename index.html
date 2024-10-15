@@ -31,11 +31,11 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Moon texture loading
+        // Moon texture loading (new links for realistic Moon textures)
         const textureLoader = new THREE.TextureLoader();
-        const moonTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_color.jpg');
-        const normalTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_normal.jpg');
-        const displacementTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/virtualdiscovery/nasa-moon-textures/8k/moon_8k_displacement.jpg');
+        const moonTexture = textureLoader.load('https://cdn.eso.org/images/large/eso1907a.jpg'); // Moon surface texture
+        const normalTexture = textureLoader.load('https://raw.githubusercontent.com/cubosort/earth-moon-textures/main/2k_moon_normal_map.jpg'); // Normal map
+        const displacementTexture = textureLoader.load('https://raw.githubusercontent.com/cubosort/earth-moon-textures/main/2k_moon_displacement_map.jpg'); // Displacement map
 
         // Moon geometry and material
         const moonGeometry = new THREE.SphereGeometry(2, 128, 128);
